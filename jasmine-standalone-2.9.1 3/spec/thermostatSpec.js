@@ -63,3 +63,39 @@ describe("Thermostat", function () {
   })
 
 })
+
+
+describe("Thermostat mode and energy boundaries", function () {
+  var thermostat;
+  beforeEach(function () { thermostat = new Thermostat(); });
+
+  it("caps the temperature immediately when power saving is re-enabled", function () {
+    thermostat.powerSaving(false);
+    for (var i = 0; i < 12; i++) thermostat.up();
+    thermostat.powerSaving(true);
+    expect(thermostat.temp).toEqual(25);
+    expect(function () { thermostat.up(); }).toThrow();
+  });
+
+  it("preserves a lower temperature when changing power saving mode", function () {
+    thermostat.down();
+    thermostat.powerSaving(false);
+    thermostat.powerSaving(true);
+    expect(thermostat.temp).toEqual(19);
+  });
+
+  [18, 24].forEach(function (temperature) {
+    it("reports medium usage at " + temperature + " degrees", function () {
+      thermostat.temp = temperature;
+      expect(thermostat.usage()).toEqual("medium-usage");
+    });
+  });
+
+  [25, 32].forEach(function (temperature) {
+    it("reports high usage at " + temperature + " degrees", function () {
+      thermostat.powerSaving(false);
+      thermostat.temp = temperature;
+      expect(thermostat.usage()).toEqual("high-usage");
+    });
+  });
+});
