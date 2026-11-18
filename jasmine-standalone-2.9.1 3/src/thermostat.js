@@ -21,6 +21,7 @@ Thermostat.prototype = {
 
     powerSaving: function(mode) {
        this.mode = mode;
+       if (this.temp > this._maxTemp()) this.temp = this._maxTemp();
     },
 
     reset: function() {
@@ -29,7 +30,8 @@ Thermostat.prototype = {
 
     usage: function(){
        if(this.temp < 18) {return "low-usage"}
-       else {return "medium-usage"};
+       else if(this.temp < 25) {return "medium-usage"}
+       else {return "high-usage"};
     },
 
     _minTemp: function() {
